@@ -1,0 +1,9 @@
+security:
+  basic:
+    enabled: true
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.0.109:3307/security_learn?useUnicode=yes&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
