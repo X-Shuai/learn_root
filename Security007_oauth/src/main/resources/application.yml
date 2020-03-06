@@ -3,4 +3,5 @@ security:
     client:
       client-id: xs
       client-secret: shuai
-      registered-redirect-uri: http://mrbird.cc
+      registered-redirect-uri: http://xs-shuai.com
+

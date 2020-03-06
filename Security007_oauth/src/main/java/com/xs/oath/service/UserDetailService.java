@@ -28,7 +28,6 @@ public class UserDetailService implements UserDetailsService {
         MyUser user = new MyUser();
         user.setUserName(s);
         user.setPassword(this.passwordEncoder.encode("123456"));
-//        return new MyUser(s,user.getPassword(),true,true,true,true);
         return  new User(s, user.getPassword(), user.isEnabled(),
                 user.isAccountNonExpired(), user.isCredentialsNonExpired(),
                 user.isAccountNonLocked(), AuthorityUtils.commaSeparatedStringToAuthorityList("admin"));
