@@ -1,0 +1,6 @@
+security:
+  oauth2:
+    client:
+      client-id: xs
+      client-secret: shuai
+      registered-redirect-uri: http://mrbird.cc

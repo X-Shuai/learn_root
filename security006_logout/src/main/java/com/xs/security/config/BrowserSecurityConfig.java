@@ -4,6 +4,7 @@ import com.xs.security.filter.SmsCodeFilter;
 import com.xs.security.filter.ValidateCodeFilter;
 import com.xs.security.handler.MyAuthenticationFailureHandler;
 import com.xs.security.handler.MyAuthenticationSucessHandler;
+import com.xs.security.handler.MyLogOutSuccessHandler;
 import com.xs.security.service.UserDetailService;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private MyAuthenticationFailureHandler authenticationFailureHandler;
+
+    @Autowired
+    private MyLogOutSuccessHandler logOutSuccessHandler;
 
     @Autowired
     private ValidateCodeFilter validateCodeFilter;
@@ -76,6 +80,11 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenRepository(persistentTokenRepository()) // 配置 token 持久化仓库
                 .tokenValiditySeconds(3600) // remember 过期时间，单为秒
                 .userDetailsService(userDetailService) // 处理自动登录逻辑
+                .and().logout()
+                .logoutUrl("/signout")
+                // .logoutSuccessUrl("/signout/success")
+                .logoutSuccessHandler(logOutSuccessHandler)
+                .deleteCookies("JSESSIONID")
                 .and()
                 .authorizeRequests() // 授权配置
                 .antMatchers("/authentication/require","/code/image","/code/sms",
