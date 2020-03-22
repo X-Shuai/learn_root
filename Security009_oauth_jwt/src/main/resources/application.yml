@@ -1,0 +1,12 @@
+security:
+  oauth2:
+    client:
+      client-id: xs
+      client-secret: shuai
+      registered-redirect-uri: http://xs-shuai.com
+spring:
+  redis:
+    host: 192.168.0.109
+    port: 6379
+    database: 3
+    password: redis
