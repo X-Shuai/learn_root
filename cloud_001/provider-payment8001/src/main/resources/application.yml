@@ -12,7 +12,15 @@ spring:
     password: root
     url: jdbc:mysql://192.168.0.109:3307/db_cloud?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
 
-
 mybatis:
   mapperLocations: classpath:mapper/*.xml
   type-aliases-package: com.xs.entity
+
+eureka:
+  client:
+#    把自己注册到eurekaServer
+    register-with-eureka: true
+#    是否从eurekaService 抓取自己的注册信息,默认为true,单点无所谓,集群是设置为true,才能配合Robbie负载均衡
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka

@@ -31,9 +31,14 @@
         <dependency>
             <groupId>com.xs</groupId>
             <artifactId>cloud-commons</artifactId>
-            <version>1.0-SNAPSHOT</version>
+        </dependency>
+<!--        eureka-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
     </dependencies>
+
 
 
 </project>
