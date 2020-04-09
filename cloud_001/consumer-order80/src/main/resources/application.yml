@@ -8,4 +8,7 @@ eureka:
     #    是否从eurekaService 抓取自己的注册信息,默认为true,单点无所谓,集群是设置为true,才能配合Robbie负载均衡
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:7001/eureka
+      defaultZone: http://localhost:7002/eureka/,http://localhost:7001/eureka/
+  instance:
+    instance-id: order80
+    prefer-ip-address: true

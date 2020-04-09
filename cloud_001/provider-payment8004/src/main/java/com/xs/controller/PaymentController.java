@@ -5,12 +5,9 @@ import com.xs.entity.Payment;
 import com.xs.service.PaymentService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @program: learn_root
@@ -23,8 +20,6 @@ import java.util.List;
 public class PaymentController {
     @Resource
     private PaymentService paymentService;
-    @Resource
-    private DiscoveryClient discoveryClient;
 
     @Value("${server.port}")
     private String port;
@@ -41,22 +36,11 @@ public class PaymentController {
         log.info("查询"+port);
         return  CommonResult.okData(payment);
     }
-    @GetMapping(value = "/payment/discovery")
-    public CommonResult getDiscovery(){
-        List<String> services = discoveryClient.getServices();
-        log.info("服务");
-        services.stream().forEach(System.out::print);
-        List<ServiceInstance> instances = discoveryClient.getInstances("PRIVDER-PAYMENT-SERVICE");
-        instances.stream().forEach(x->{
-            log.info("服务id"+x.getInstanceId()+
-                    "主机:"+x.getHost()+"\n" +
-                    "端口:"+x.getPort()+"\n"+
-                    "url"+x.getUri());
-
-        });
-        return  CommonResult.okData(instances);
+    @GetMapping(value = "/payment/zk")
+    public CommonResult getZookeeper( ){
+        log.info("查询"+port);
+        return  CommonResult.okData(port);
     }
-
 
 
 

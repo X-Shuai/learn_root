@@ -1,8 +1,8 @@
 server:
-  port: 7001
+  port: 7002
 eureka:
   instance:
-    hostname: xs-shuaieureka001 #服务端的实例名称
+    hostname: xs-shuaieureka002 #服务端的实例名称
   client:
     # 不向注册中心注册自己
     register-with-eureka: false
@@ -10,7 +10,4 @@ eureka:
     fetch-registry: false
     service-url:
       #      设置Eureka Server交互的地址查询和注册服务都需要依赖这个地址
-      defaultZone: http://localhost:7002/eureka/
-#  server:
-#    rate-limiter-enabled: false
-#    eviction-interval-timer-in-ms: 2000
+      defaultZone: http://localhost:7001/eureka/
