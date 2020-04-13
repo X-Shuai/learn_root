@@ -299,4 +299,47 @@ spring:
 
 ```
 
+## Consul 
+
+go语言写的,
+
+有一天可视化的界面
+```
+docker run -p 8500:8500/tcp consul agent -server -ui -bootstrap-expect=1 -client=0.0.0.0
+
+```
+配置
+pom.xml
+```xml
+  <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+```
+yml
+```yaml
+spring:
+  application:
+    name: privder-payment-service
+  cloud:
+    consul:
+      host: 192.168.0.109
+      port: 8500
+      discovery:
+        service-name: ${spring.application.name}
+```
+启动类注解
+```java
+@SpringBootApplication
+@EnableDiscoveryClient
+public class Payment8006 {
+    public static void main(String[] args) {
+        SpringApplication.run(Payment8006.class,args);
+    }
+}
+```
+
+三个的区别:CAP的区别  AP(eureka) CP(consul/zookeeper) 
+
+Ribbon
 
