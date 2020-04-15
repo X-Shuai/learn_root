@@ -341,5 +341,16 @@ public class Payment8006 {
 
 三个的区别:CAP的区别  AP(eureka) CP(consul/zookeeper) 
 
+
+
+集中式的Lb 进程内LB
+
 Ribbon
 
+ribbon的组件在 netflix client
+
+
+resetTemplate:
+ForObject
+
+ribbon 的轮训算法
