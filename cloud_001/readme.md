@@ -354,3 +354,107 @@ resetTemplate:
 ForObject
 
 ribbon 的轮训算法
+```com.netflix.loadbalancer.RoundRobinRule  轮询
+com.netflix.loadbalancer.RandomRule 随机
+com.netflix.loadbalancer.RetryRule 先按照RoundRobinRule的策略获取服务,如果获取服务失败则在指定时间内进行重试,获取可用的服务
+WeightedResponseTimeRule 对RoundRobinRule的扩展,响应速度越快的实例选择权重越多大,越容易被选择
+BestAvailableRule	会先过滤掉由于多次访问故障而处于断路器跳闸状态的服务,然后选择一个并发量最小的服务
+AvailabilityFilteringRule	先过滤掉故障实例,再选择并发较小的实例
+ZoneAvoidanceRule	默认规则,复合判断server所在区域的性能和server的可用性选择服务器
+```
+
+自定义轮训算法
+
+// todo
+
+1. 新建一个包
+2. 新建规则
+3. 主启动类添加@RibbonClient 注解
+
+算法: reset 自己次请求% 服务器的集群数量 =实际调用的服务器位置下标 
+    重启后计数从1开始
+
+
+## openFeign 
+ feign 停止更新
+ 
+**openFeign:** 一个声明式的web服务客户端,当web服务客户端变得容易,只创建一个接口,并添加注解即可
+**作用:** 
+
+区别:
+服务调用者
+1. 引入依赖 openFeign
+2. 启动类 开启 @EnableFeignClients
+3. 接口 @component  @FeignClient(value = "微服务名称"); 调用 
+4. 自带服务的负载均衡
+
+
+超时控制:  
+1. 默认的等待一秒钟 超时报错
+2. 开启配置
+```yaml
+
+ribbon:
+  # 指的是建立连接所用的时间,适用于网络状态正常的情况下,两端连接所用的时间
+  ReadTimeout: 5000
+  # 指的是建立连接后从服务器读取到可用资源所用的时间
+  ConnectTimeout: 5000
+```
+日志打印:
+日志级别:
+
+1. 配置类
+```java
+
+@Configuration
+public class FeignConfig {
+
+/**
+     * feignClient配置日志级别
+     *
+     * @return
+     */
+@Bean
+public Logger.Level feignLoggerLevel() {
+    // 请求和响应的头信息,请求和响应的正文及元数据
+    return Logger.Level.FULL;
+    }   
+}
+```
+2. yml配置
+```yaml
+
+logging:
+  level:
+    # feign日志以什么级别监控哪个接口
+    com.xs.service.PaymentFeignService: debug
+```
+# Hystrix
+分布式系统中,会有延迟和容错的开源库,有时候会调用失败,超时,异常等信息.
+Hystrix 保证依赖出问题的情况下,不会导致服务的失败,避免级联故障,提高分布式的弹性
+
+服务的降级
+服务熔断
+服务的限流
+
+概念:
+- 降级 
+  - 当别的不可用,有一个友好的提示 fallback
+  - 那些出现降级    
+- 熔断
+  - 当访问量过大后,拒绝访问,并返回友好提示(保险丝)
+- 限流 
+  - 高并发情况下,进行 
+
+ 
+ 配置
+ ```xml
+     <!--hystrix-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+```
+
+
+

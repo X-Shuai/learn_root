@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xs.dao.PaymentDao">
+
+
+    <insert id="create" parameterType="com.xs.entity.Payment" useGeneratedKeys="true" keyProperty="id">
+        insert  into payment(serial) values (#{serial})
+    </insert>
+    <resultMap id="BaseMap" type="com.xs.entity.Payment">
+        <id column="id" property="id" ></id>
+        <id column="serial" property="serial" ></id>
+    </resultMap>
+
+    <select id="getPaymentById" resultMap="BaseMap">
+    select * from payment where id=#{id}
+    </select>
+</mapper>
