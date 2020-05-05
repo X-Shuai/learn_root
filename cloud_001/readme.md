@@ -455,6 +455,208 @@ Hystrix 保证依赖出问题的情况下,不会导致服务的失败,避免级�
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
 ```
+jMeter 压力测试
+Hystrix消费端和服务端都可以加入
+
+服务降级:  
+1. 超时
+2. 对方挂机
+3. 处理时间过长
+
+服务端降级
+配置:
+````java
+    @HystrixCommand(fallbackMethod = "payment_TimeOutHandler", commandProperties = {
+            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000")
+    })
+    public String paymentInfo_TimeOut(Integer id) {
+
+    }
+
+    /**
+     * fallbackMethod
+     * @param id
+     * @return
+     */
+    public String payment_TimeOutHandler(Integer id) {
+        return "线程池:" + Thread.currentThread().getName() + " 系统繁忙或运行错误,请稍后重试,id:" + id + "\t" + "o(╥﹏╥)o";
+    }
+//一旦调用失败,调用失败的方法
+方法返回处理的方法
+````
+客户端降级:
+配置文件
+```yaml
+feign:
+  hystrix:
+    # 在feign中开启Hystrix
+    enabled: true
+```
+fallbackService接口
+```java
+@Component
+//失败的调用接口
+@FeignClient(value = "CLOUD-PROVIDER-HYSTRIX-PAYMENT",fallback = PaymentFallbackService.class)
+public interface PaymentHystrixService {
+
+
+    /**
+     * 正常访问
+     * @param id
+     * @return
+     */
+    @GetMapping("/payment/hystrix/ok/{id}")
+    String paymentInfo_OK(@PathVariable("id") Integer id);
+
+    /**
+     * 超时访问
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/payment/hystrix/timeout/{id}")
+    String paymentInfo_TimeOut(@PathVariable("id") Integer id);
+
+}
+
+
+/***
+*每个重写方法的失败回调
+*/
+@Component
+public class PaymentFallbackService implements PaymentHystrixService {
+    @Override
+    public String paymentInfo_OK(Integer id) {
+        return "----PaymentFallbackService fall back-paymentInfo_OK,o(╥﹏╥)o";
+    }
+
+    @Override
+    public String paymentInfo_TimeOut(Integer id) {
+        return "----PaymentFallbackService fall back-paymentInfo_TimeOut,o(╥﹏╥)o";
+    }
+}
+
+```
+Controller层
+
+```java
+
+@RestController
+@Slf4j
+//全局的通用的失败方法
+@DefaultProperties(defaultFallback = "payment_Global_FallbackMethod")
+public class OrderHystrixController {
+    @Resource
+    private PaymentHystrixService paymentHystrixService;
+
+
+    /**
+     * 正常访问
+     * http://localhost/consumer/payment/hystrix/ok/32
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/consumer/payment/hystrix/ok/{id}")
+    public String paymentInfo_OK(@PathVariable("id") Integer id) {
+        return paymentHystrixService.paymentInfo_OK(id);
+    }
+
+    /**
+     * 超时访问
+     * 
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/consumer/payment/hystrix/timeout/{id}")
+       //默认的失败处理方法
+   /** @HystrixCommand(fallbackMethod = "paymentTimeOutFallbackMethod", 
+        commandProperties = {
+            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "1500")
+    })
+    **/
+    @HystrixCommand //不带参数是默认使用全局的
+    public String paymentInfo_TimeOut(@PathVariable("id") Integer id) {
+        //int age = 10/0;
+        return paymentHystrixService.paymentInfo_TimeOut(id);
+    }
+
+    /**
+     * 超时方法fallback
+     * @param id
+     * @return
+     */
+    public String paymentTimeOutFallbackMethod(@PathVariable("id") Integer id) {
+        return "我是消费者80,对方支付系统繁忙请10秒种后再试或者自己运行出错请检查自己,o(╥﹏╥)o";
+    }
+
+    /**
+     * 全局fallback
+     *
+     * @return
+     */
+    public String payment_Global_FallbackMethod() {
+        return "Global异常处理信息,请稍后重试.o(╥﹏╥)o";
+    }
+}
+```
+启动类注解:@EnableHystrix
+
+
+## 熔断
+限流,提示,调用稳定后进行恢复链路
+
+参数配置
+```java
+
+//====服务熔断
+
+    /**
+     * 在10秒窗口期中10次请求有6次是请求失败的,断路器将起作用
+     * @param id
+     * @return
+     */
+    @HystrixCommand(
+            fallbackMethod = "paymentCircuitBreaker_fallback", commandProperties = {
+            @HystrixProperty(name = "circuitBreaker.enabled", value = "true"),// 是否开启断路器
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "10"),// 请求次数
+            @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "10000"),// 时间窗口期/时间范文
+            @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "60")// 失败率达到多少后跳闸
+    }
+    )
+```
+**总结:** 
+1. 状态:开放,半开,熔断
+2. 错误百分比
+3. 窗口期
+4. 阈值 
+
+仪表盘
+
+
+## 网关
+zuul  
+gateWay 新一代的网关,spring 2.0 之上
+底层使用 webflux ,而webflux 使用netty
+
+gateway 异步非阻塞式的  
+
+传统的zuul,tomcat的阻塞式的处理流程
+
+### 三个概念
+1. 路由:路由是构建网关的基本模块,它由ID,目标URI,一系列的断言和过滤器组成,如断言为true则匹配该路由
+2. 断言:参考的是Java8的java.util.function.Predicate,开发人员可以匹配HTTP请求中的所有内容(例如请求头或请求参数),如果请求与断言相匹配则进行路由
+3. 过滤:指的是Spring框架中GatewayFilter的实例,使用过滤器,可以在请求被路由前或者之后对请求进行修改.
+
+
+
+
+
+
+
+
+
 
 
 
