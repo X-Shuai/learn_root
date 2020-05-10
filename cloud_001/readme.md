@@ -645,10 +645,407 @@ gateway 异步非阻塞式的
 传统的zuul,tomcat的阻塞式的处理流程
 
 ### 三个概念
-1. 路由:路由是构建网关的基本模块,它由ID,目标URI,一系列的断言和过滤器组成,如断言为true则匹配该路由
-2. 断言:参考的是Java8的java.util.function.Predicate,开发人员可以匹配HTTP请求中的所有内容(例如请求头或请求参数),如果请求与断言相匹配则进行路由
-3. 过滤:指的是Spring框架中GatewayFilter的实例,使用过滤器,可以在请求被路由前或者之后对请求进行修改.
+1. 路由(router):路由是构建网关的基本模块,它由ID,目标URI,一系列的断言和过滤器组成,如断言为true则匹配该路由
+2. 断言(predicate):参考的是Java8的java.util.function.Predicate,开发人员可以匹配HTTP请求中的所有内容(例如请求头或请求参数),如果请求与断言相匹配则进行路由
+3. 过滤(filter):指的是Spring框架中GatewayFilter的实例,使用过滤器,可以在请求被路由前或者之后对请求进行修改.
 
+配置
+pom.xml
+```xml
+    <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.xs</groupId>
+            <artifactId>cloud-commons</artifactId>
+        </dependency>
+        <!--        eureka-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+```
+启动类:
+```java
+@SpringBootApplication
+@EnableEurekaClient
+public class GateWay9527
+{
+    public static void main(String[] args) {
+        SpringApplication.run(GateWay9527.class,args);
+    }
+}
+```
+yaml配置
+```yaml
+server:
+  port: 9527
+
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # 开启从注册中心动态创建路由的功能，利用微服务名称j进行路由
+      routes:
+        - id: payment_route # 路由的id,没有规定规则但要求唯一,建议配合服务名
+          #匹配后提供服务的路由地址
+          uri: http://192.168.246.1:8001
+#          uri: http://PRIVDER-PAYMENT-SERVICE
+          predicates:
+            - Path=/payment/** # 断言，路径相匹配的进行路由
+        - id: payment_route2
+          uri: http://192.168.246.1:8001
+#          uri: http://PRIVDER-PAYMENT-SERVICE
+          predicates:
+            - Path=/payment/lb/** #断言,路径相匹配的进行路由
+
+
+eureka:
+  instance:
+    hostname: cloud-gateway-service
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:7002/eureka/,http://localhost:7001/eureka/
+```
+服务名的访问:
+pom.xml
+```xml
+<dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+```
+yml:需要注意的是uri的协议lb,表示启用Gateway的负载均衡功能.
+
+### Predicate
+协议转换，路由转发
+流量聚合，对流量进行监控，日志输出
+作为整个系统的前端工程，对流量进行控制，有限流的作用
+作为系统的前端边界，外部流量只能通过网关才能访问系统
+可以在网关层做权限的判断
+可以在网关层做缓存
+
+包含了 after before between cookie header host method 
+
+
+```xml
+- After=2017-01-20T17:42:47.789-07:00[America/Denver]
+- Before=2017-01-20T17:42:47.789-07:00[America/Denver]
+- Cookie=username,zzyy //cookie 
+- Header=X-Request-Id, \d+ #请求头要有X-Request-Id属性，并且值为正数
+- Host=**.atguigu.com
+- Method=GET  //方法请求方式
+- Query=username, \d+ # 要有参数名username并且值还要是正整数才能路由
+```
+
+### filter
+在请求前后进行过滤
+
+全局拦截器 
+```java
+@Component
+@Slf4j
+public class MyLogGatewayFilter implements GlobalFilter, Ordered {
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        log.info("come in global filter: {}", new Date());
+
+        ServerHttpRequest request = exchange.getRequest();
+        String uname = request.getQueryParams().getFirst("uname");
+        if (uname == null) {
+            log.info("用户名为null，非法用户");
+            exchange.getResponse().setStatusCode(HttpStatus.NOT_ACCEPTABLE);
+            return exchange.getResponse().setComplete();
+        }
+        // 放行
+        return chain.filter(exchange);
+    }
+
+    /**
+     * 过滤器加载的顺序 越小,优先级别越高
+     *
+     * @return
+     */
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+}
+```
+
+## 分布式配置中心
+配置中心,统一的配置管理中心(中心化的配置)
+* 一个独立的服务
+ * 集中管理配置文件
+ * 不同环境不同配置，动态化的配置更新，分环境部署比如dev/test/prod/beta/release
+ * 运行期间动态调整配置，不再需要在每个服务部署的机器上编写配置文件，服务会向配置中心统一拉取配置自己的信息
+ * 当配置发生变动时，服务不需要重启即可感知到配置的变化并应用新的配置
+ * 将配置信息以REST接口的形式暴露
+
+配置中心配置:
+1. 新建仓库
+2. 配置git 
+3. pom.xml
+```xml
+
+  <dependencies>
+   <!-- springCloud Config -->
+   <dependency>
+     <groupId>org.springframework.cloud</groupId>
+     <artifactId>spring-cloud-config-server</artifactId>
+   </dependency>
+   <!-- 避免Config的Git插件报错：org/eclipse/jgit/api/TransportConfigCallback  -->
+   <dependency>
+       <groupId>org.eclipse.jgit</groupId>
+       <artifactId>org.eclipse.jgit</artifactId>
+       <version>4.10.0.201712302008-r</version>
+   </dependency>
+   <!-- 图形化监控 -->
+   <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-starter-actuator</artifactId>
+   </dependency>
+   <!-- 熔断 -->
+   <dependency>
+     <groupId>org.springframework.cloud</groupId>
+     <artifactId>spring-cloud-starter-hystrix</artifactId>
+   </dependency>
+   <dependency>
+     <groupId>org.springframework.cloud</groupId>
+     <artifactId>spring-cloud-starter-eureka</artifactId>
+   </dependency>
+   <dependency>
+     <groupId>org.springframework.cloud</groupId>
+     <artifactId>spring-cloud-starter-config</artifactId>
+   </dependency>
+   <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-starter-jetty</artifactId>
+   </dependency>
+   <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-starter-web</artifactId>
+   </dependency>
+   <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-starter-test</artifactId>
+   </dependency>
+   <!-- 热部署插件 -->
+   <dependency>
+     <groupId>org.springframework</groupId>
+     <artifactId>springloaded</artifactId>
+   </dependency>
+   <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-devtools</artifactId>
+   </dependency>
+  </dependencies> 
+
+```
+4. yaml
+```yaml
+server: 
+  port: 3344 
+  
+spring:
+  application:
+    name:  microservicecloud-config
+  cloud:
+    config:
+      server:
+        git:
+          uri: git@github.com:zzyybs/microservicecloud-config.git #GitHub上面的git仓库名字
+           search-paths:
+              - spring-config
+        label: master #分支
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka
+
+```
+5. 启动类
+```java
+@SpringBootApplication
+@EnableConfigServer
+public class ConfigCenterMain3344 {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigCenterMain3344.class, args);
+    }
+}
+```
+
+启动注册中心,启动配置中心
+
+配置的读取规则:
+label :分支
+application:服务名称
+profile: 环境后缀
+{label}/{application}-{profile}.yml
+{application}/{profile}[/{label}]
+{label}/{application}-{profile}.yml
+
+### 客户端配置:
+bootstrap.yml:系统级优先级更高
+application.yml
+```yaml
+server:
+  port: 3355
+
+spring:
+  application:
+    name: config-client
+  cloud:
+    config:
+      label: master # 分支名称
+      name: config #配置文件名称
+      profile: dev # 读取的后缀，上述三个综合，为master分支上的config-dev.yml的配置文件被读取，http://config-3344.com:3344/master/config-dev.yml
+      uri: http://config-3344.com:3344 #配置中心的地址
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka
+```
+
+pom.xml
+```xml
+   <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+```
+启动类:
+```java
+@SpringBootApplication
+@EnableEurekaClient
+public class ConfigClientMain3355 {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigClientMain3355.class, args);
+    }
+}
+```
+
+动态刷新的配置
+客户端: 
+pom.xml:
+```xml
+ <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+```
+配置监控端点
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+```
+刷新的标签:
+@RefreshScope业务类Controller修改
+运维发起请求,刷新接口
+
+## 消息总线
+spring config bus
+
+rabbitmq环境
+
+安装:
+```shell script
+>mkdir rabbitmq
+>chomd 1000 rabbitmq/
+>docker run -d --hostname rabbit-svr --name rabbit -p 5672:5672 -p 15672:15672 -p 25672:25672 -v /var/rabbitmq:/var/lib/rabbitmq rabbitmq:management
+```
+账号是:guest 密码也是guest
+
+通知:1.客户端 2.服务端(通知全部), 进行全部的通知 
+服务端: 配置rabbitmq 
+```yaml
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+# 暴露bus刷新配置的端点
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "bus-refresh"
+```
+需要配置依赖:
+```xml
+  <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-actuator</artifactId>
+   </dependency>
+```
+客户端消息总线:
+```xml
+ <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+        </dependency>
+<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+yml配置
+```yaml
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+```
+动态刷新的定点通知:
+http://localhost:配置中心端口号/actuator/bus-refresh/{destination}
+/bus/refresh请求不再发送到具体的服务实例上,而是发给config server并通过destination参数类指定需要重新配置的服务或实例
+destination:微服务名:端口号
+
+## 消息驱动
+
+使用一种适配绑定的方式,在mq中切换,屏蔽底层信息中间件的差异,降低切换成本,统一消息的编程模型
+目前支持 kafuka  
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 
