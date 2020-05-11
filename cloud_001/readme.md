@@ -1036,6 +1036,177 @@ destination:微服务名:端口号
 使用一种适配绑定的方式,在mq中切换,屏蔽底层信息中间件的差异,降低切换成本,统一消息的编程模型
 目前支持 kafuka  
 
+发布订阅模式
+
+spring Cloud Stream 
+
+生产者
+pom.xml
+```xml
+ <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+```
+yaml
+```yaml
+server:
+  port: 8801
+
+spring:
+  application:
+    name: cloud-stream-provider
+  cloud:
+    stream:
+      binders: # 在此处配置要绑定的rabbitMQ的服务信息
+        defaultRabbit: # 表示定义的名称，用于binding的整合
+          type: rabbit # 消息中间件类型
+          environment: # 设置rabbitMQ的相关环境配置
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+      bindings: # 服务的整合处理
+        output: # 这个名字是一个通道的名称
+          destination: studyExchange # 表示要使用的exchange名称定义
+          content-type: application/json # 设置消息类型，本次为json，文本则设为text/plain
+          binder: defaultRabbit # 设置要绑定的消息服务的具体设置
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 2 # 设置心跳的间隔时间，默认30
+    lease-expiration-duration-in-seconds: 5 # 超过5秒间隔，默认90
+    instance-id: send-8801.com # 主机名
+    prefer-ip-address: true # 显示ip
+```
+接口:
+```java
+public interface IMessageProvider {
+    /**
+     * 消息发送
+     * @return
+     */
+    String send();
+}
+@EnableBinding(Source.class)
+public class MessageProviderImpl implements IMessageProvider {
+
+    /**
+     * 消息发送管道
+     */
+    @Resource
+    private MessageChannel output;
+
+    @Override
+    public String send() {
+        String serial = UUID.randomUUID().toString();
+        output.send(MessageBuilder.withPayload(serial).build());
+        System.out.println("serial = " + serial);
+        return serial;
+    }
+}
+```
+消费者:
+pom.xml 一样
+
+yaml:
+```yaml
+server:
+  port: 8802
+
+spring:
+  application:
+    name: cloud-stream-consumer
+  cloud:
+    stream:
+      binders: # 在此处配置要绑定的rabbitMQ的服务信息
+        defaultRabbit: # 表示定义的名称，用于binding的整合
+          type: rabbit # 消息中间件类型
+          environment: # 设置rabbitMQ的相关环境配置
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+      bindings: # 服务的整合处理
+        input: # 这个名字是一个通道的名称
+          destination: studyExchange # 表示要使用的exchange名称定义
+          content-type: application/json # 设置消息类型，本次为json，文本则设为text/plain
+          binder: defaultRabbit # 设置要绑定的消息服务的具体设置
+          group: spectrumrpcA # 分组 
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 2 # 设置心跳的间隔时间，默认30
+    lease-expiration-duration-in-seconds: 5 # 超过5秒间隔，默认90
+    instance-id: receive-8802.com #主机名
+    prefer-ip-address: true # 显示ip
+```
+订阅部分:
+```java
+@Component
+@EnableBinding(Sink.class)
+public class ReceiveMessageListenerController {
+    @Value("${server.port}")
+    private String serverPort;
+
+    @StreamListener(Sink.INPUT)
+    public void input(Message<String> message){
+        System.out.println("消费者1号，----->接收到的消息："+ message.getPayload() +"\t port:" + serverPort);
+    }
+}
+```
+
+分组消费和持久化:
+重复消费问题:
+不同的组可以消费,同一个组会发生竞争关系,只会有一个可以消费
+
+自定义分组:
+
+持久化: 
+
+## 请求链路追踪
+zipkin安装 
+
+
+
+# spring cloud Alibaba
+
 
 
 
