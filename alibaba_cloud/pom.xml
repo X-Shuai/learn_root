@@ -11,6 +11,7 @@
     <modules>
         <module>nacos_provider_9001</module>
         <module>nacos_consumer_83</module>
+        <module>nocaos_config3377</module>
     </modules>
     <!--统一管理jar包版本-->
     <properties>

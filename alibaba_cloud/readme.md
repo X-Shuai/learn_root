@@ -281,4 +281,61 @@ cp和ap的切换
 //todo
 
 ### 配置中心
+
+nacos 的配置中心进行配置
+配置流程:
+pom.xml
+```xml
+ <dependency>
+   <groupId>com.alibaba.cloud</groupId>
+   <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+</dependency>
+```
+配置文件:bootrap 高于application
+bootstrap.yml
+```yaml
+
+server:
+  port: 3377
+spring:
+  application:
+    name: nacos-config-client
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.0.109:8848 # 注册中心
+      config:
+        server-addr: 192.168.0.109:8848 # 配置中心
+        file-extension: yml # 这里指定的文件格式需要和nacos上新建的配置文件后缀相同，否则读不到
+```
+application.yml
+```yaml
+spring:
+  profiles:
+    active: dev # 开发环境
+
+```
+配置规则:
+${prefix} - ${spring.profiles.active} . ${file-extension}
+prefix默认为pring.application.name的值，也可以通过配置项spring.cloud.nacos.config.prefix来配置；
+
+spring.profiles.active即为当前环境对应的profile。注意，当spring.profiles.active为空时，对应的连接符-也将不存在，dataId的拼接格式变成${prefix}.${file-extension}；
+
+file-extension为配置内容的数据格式，可以通过配置项spring.cloud.nacos.config.file-extension来配置。
+
+分类配置:
+多环境.多项目
+三种配置概念:
+namespace: 保留空间(public)   可用于生产环境:dev test prod
+groupId: DEFAULT_GROUP 不同的服务分组(可进行分组)
+dataId:  就是nacos配置的环境
+
+配置:
+1. 修改application.yaml active就可以进行修改(用于环境的切换)
+2. 创建两个分组,在bootstrap.yaml添加分组, 添加分组 group:{group}
+3. 创建命名空间,bootstrap中添加namespace: {namespace的id}
+
+nacos:集群的配置
+ 
+
  
