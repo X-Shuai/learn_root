@@ -336,6 +336,46 @@ dataId:  就是nacos配置的环境
 3. 创建命名空间,bootstrap中添加namespace: {namespace的id}
 
 nacos:集群的配置
+三个以上的nacos才能成为集群,
+linux集群:
+```shell script
+1. 下载源文件,解压
+2. 安装数据库,执行nacos-mysql.sql
+
+```
+
+docker 的安装集群:
+nacos自带嵌入式数据库,
+
+## sentinel
+**安装:**
+docker安装
+```shell script
+>docker pull bladex/sentinel-dashboard
+>docker run --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard
+```
+
+**流控规则:**
+资源名:唯一的名称,默认的请求路径
+- 阈值类型/单机阈值
+ - QPS:每秒钟的请求数量
+ - 线程数,调用该API的线程数达到一定的时候,进行限流
+- 是否集群:
+- 流控模式
+ - 直接
+ - 关联
+ - 链路
+- 流控效果
+ - 快速失败
+ - warm up:
+ - 
+    
+流控模式:
+直接->快速失败
+
+流控规则:
+
+
  
 
  

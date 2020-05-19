@@ -12,6 +12,7 @@
         <module>nacos_provider_9001</module>
         <module>nacos_consumer_83</module>
         <module>nocaos_config3377</module>
+        <module>sentinel-server8401</module>
     </modules>
     <!--统一管理jar包版本-->
     <properties>
@@ -87,18 +88,18 @@
         </dependencies>
     </dependencyManagement>
 
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--                <configuration>-->
-<!--                    <fork>true</fork>-->
-<!--                    <addResources>true</addResources>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork>
+                    <addResources>true</addResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <!--第三方maven私服-->
     <repositories>
