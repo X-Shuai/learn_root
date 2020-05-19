@@ -1,6 +1,7 @@
 # 分布式
-## 注册中心
-基础的架构:
+## 注册中心Eureka
+用于服务的注册与发现
+案例架构:
 1. 一个服务提供者
 2. 一个消费者
 3. 服务者和消费者都注册到注册中心
@@ -135,11 +136,10 @@ eureka:
     service-url:
       defaultZone: http://localhost:7001/eureka
 ```
-集群配置:
+**集群配置:**
 相互注册,相互守望:互相注册
 修改host的配置
 ```yaml
- 
 127.0.0.1       xs-shuaieureka001.com
 127.0.0.1       xs-shuaieureka002.com
 ```
@@ -159,11 +159,11 @@ eureka:
       #      设置Eureka Server交互的地址查询和注册服务都需要依赖这个地址
       defaultZone: http://localhost:7001/eureka/
 ```
-客户端的注册
+**客户端的注册:**
 ```yaml
 http://localhost:7002/eureka/,http://localhost:7001/eureka/
 ```
-消费者的配置
+**消费者的配置:**
 1.修改链接为服务名
 2.resetTemplate 添加负载均衡
 ```java
@@ -195,9 +195,6 @@ eureka:
 # 访问信息ip信息提示
      prefer-ip-address: true
 ```
-
-### 服务发现
-
 
 ```java
 @Resource
@@ -255,6 +252,7 @@ zookeeper的安装:
 
 ```
 节点是临时性的,在关闭服务一段时间丢失,再次注册服务的id变化
+//todo
 
 客户端配置
 pom
@@ -339,22 +337,21 @@ public class Payment8006 {
 }
 ```
 
+一致性:Consistency
+可用性:available
+分区容错性:Partition tolerance
 三个的区别:CAP的区别  AP(eureka) CP(consul/zookeeper) 
 
-
-
-集中式的Lb 进程内LB
-
-Ribbon
-
-ribbon的组件在 netflix client
-
+## Ribbon
+用于负载均衡,
+依赖包含在:netflix client,不用特别的特别引入
 
 resetTemplate:
 ForObject
 
 ribbon 的轮训算法
-```com.netflix.loadbalancer.RoundRobinRule  轮询
+```
+com.netflix.loadbalancer.RoundRobinRule  轮询
 com.netflix.loadbalancer.RandomRule 随机
 com.netflix.loadbalancer.RetryRule 先按照RoundRobinRule的策略获取服务,如果获取服务失败则在指定时间内进行重试,获取可用的服务
 WeightedResponseTimeRule 对RoundRobinRule的扩展,响应速度越快的实例选择权重越多大,越容易被选择
@@ -365,7 +362,7 @@ ZoneAvoidanceRule	默认规则,复合判断server所在区域的性能和server�
 
 自定义轮训算法
 
-// todo
+//todo
 
 1. 新建一个包
 2. 新建规则
@@ -384,16 +381,33 @@ ZoneAvoidanceRule	默认规则,复合判断server所在区域的性能和server�
 区别:
 服务调用者
 1. 引入依赖 openFeign
+```xml
+ <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
 2. 启动类 开启 @EnableFeignClients
-3. 接口 @component  @FeignClient(value = "微服务名称"); 调用 
+3. 接口 @component  @FeignClient(value = "微服务名称"); 调用
+```java
+@Component
+   @FeignClient(value = "PRIVDER-PAYMENT-SERVICE" )
+   public interface OrderService {
+   
+       @GetMapping(value = "/payment/{id}")
+        CommonResult get(@PathVariable("id") Long id );
+   
+       @PostMapping(value = "/payment/create")
+       CommonResult create(@RequestBody Payment payment);
+   
+   }
+``` 
 4. 自带服务的负载均衡
-
 
 超时控制:  
 1. 默认的等待一秒钟 超时报错
 2. 开启配置
 ```yaml
-
 ribbon:
   # 指的是建立连接所用的时间,适用于网络状态正常的情况下,两端连接所用的时间
   ReadTimeout: 5000
@@ -405,7 +419,6 @@ ribbon:
 
 1. 配置类
 ```java
-
 @Configuration
 public class FeignConfig {
 
@@ -429,7 +442,7 @@ logging:
     # feign日志以什么级别监控哪个接口
     com.xs.service.PaymentFeignService: debug
 ```
-# Hystrix
+## Hystrix
 分布式系统中,会有延迟和容错的开源库,有时候会调用失败,超时,异常等信息.
 Hystrix 保证依赖出问题的情况下,不会导致服务的失败,避免级联故障,提高分布式的弹性
 
