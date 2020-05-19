@@ -648,7 +648,7 @@ public class OrderHystrixController {
 仪表盘
 
 
-## 网关
+## Zuul网关
 zuul  
 gateWay 新一代的网关,spring 2.0 之上
 底层使用 webflux ,而webflux 使用netty
@@ -657,7 +657,7 @@ gateway 异步非阻塞式的
 
 传统的zuul,tomcat的阻塞式的处理流程
 
-### 三个概念
+**三个概念:**
 1. 路由(router):路由是构建网关的基本模块,它由ID,目标URI,一系列的断言和过滤器组成,如断言为true则匹配该路由
 2. 断言(predicate):参考的是Java8的java.util.function.Predicate,开发人员可以匹配HTTP请求中的所有内容(例如请求头或请求参数),如果请求与断言相匹配则进行路由
 3. 过滤(filter):指的是Spring框架中GatewayFilter的实例,使用过滤器,可以在请求被路由前或者之后对请求进行修改.
@@ -745,7 +745,7 @@ pom.xml
 ```
 yml:需要注意的是uri的协议lb,表示启用Gateway的负载均衡功能.
 
-### Predicate
+**Predicate**  
 协议转换，路由转发
 流量聚合，对流量进行监控，日志输出
 作为整个系统的前端工程，对流量进行控制，有限流的作用
@@ -766,7 +766,7 @@ yml:需要注意的是uri的协议lb,表示启用Gateway的负载均衡功能.
 - Query=username, \d+ # 要有参数名username并且值还要是正整数才能路由
 ```
 
-### filter
+**filter**  
 在请求前后进行过滤
 
 全局拦截器 
@@ -801,6 +801,9 @@ public class MyLogGatewayFilter implements GlobalFilter, Ordered {
     }
 }
 ```
+## gateWay
+
+//todo
 
 ## 分布式配置中心
 配置中心,统一的配置管理中心(中心化的配置)
@@ -816,7 +819,6 @@ public class MyLogGatewayFilter implements GlobalFilter, Ordered {
 2. 配置git 
 3. pom.xml
 ```xml
-
   <dependencies>
    <!-- springCloud Config -->
    <dependency>
@@ -915,7 +917,7 @@ profile: 环境后缀
 {application}/{profile}[/{label}]
 {label}/{application}-{profile}.yml
 
-### 客户端配置:
+**客户端配置:**  
 bootstrap.yml:系统级优先级更高
 application.yml
 ```yaml
@@ -995,7 +997,7 @@ rabbitmq环境
 ```yaml
 spring:
   rabbitmq:
-    host: localhost
+    host: 192.168.0.109
     port: 5672
     username: guest
     password: guest
@@ -1029,7 +1031,7 @@ yml配置
 ```yaml
 spring:
   rabbitmq:
-    host: localhost
+    host: 192.168.0.109
     port: 5672
     username: guest
     password: guest
@@ -1047,7 +1049,7 @@ destination:微服务名:端口号
 ## 消息驱动
 
 使用一种适配绑定的方式,在mq中切换,屏蔽底层信息中间件的差异,降低切换成本,统一消息的编程模型
-目前支持 kafuka  
+目前支持 kafka  
 
 发布订阅模式
 
@@ -1215,14 +1217,6 @@ public class ReceiveMessageListenerController {
 
 ## 请求链路追踪
 zipkin安装 
-
-
-
-
-
-
-
-
 
 
  
