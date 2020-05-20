@@ -354,6 +354,19 @@ docker安装
 >docker pull bladex/sentinel-dashboard
 >docker run --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard
 ```
+sentinel
+资源:(代码,方法,被保护的对象)
+规则:降级,熔断的规则
+
+Rt:响应时间,
+
+流量控制:
+	调用关系控制,
+	运行的指标,QPS,线程池,系统负载
+	控制效果,
+降级
+	熔断降级的概念的hytrix不同
+
 
 **流控规则:**
 资源名:唯一的名称,默认的请求路径
@@ -362,18 +375,46 @@ docker安装
  - 线程数,调用该API的线程数达到一定的时候,进行限流
 - 是否集群:
 - 流控模式
- - 直接
- - 关联
+ - 直接:直接断开
+ - 关联:当A关联资源B的时候,B达到阈值,限制A
  - 链路
 - 流控效果
- - 快速失败
- - warm up:
- - 
-    
-流控模式:
-直接->快速失败
+ - 快速失败:快速失败
+ - warm up:预热 慢慢启动
+ - 排队时间
+**降级规则:**
+- 熔断降级(没有半开的状态)
 
-流控规则:
+**热点限流:**
+//todo
+
+**系统规则:**
+
+**注解()**
+
+**服务熔断**
+
+**规则持久化**
+
+
+## 分布式事务 
+一个业务需要多个调用,多个链路
+Seata 微服务分布式事务处理,
+- 分布式事务处理过程-ID+三组件模型
+ - Transaction ID(XID) 全局唯一的事务id
+ - 三组件概念
+    - Transaction Coordinator(TC):事务协调器,维护全局事务的运行状态,负责协调并驱动全局事务的提交或回滚
+    - Transaction Manager(TM):控制全局事务的边界,负责开启一个全局事务,并最终发起全局提交或全局回滚的决议
+    - Resource Manager(RM): 控制分支事务,负责分支注册、状态汇报,并接受事务协调的指令,驱动分支(本地)事务的提交和回滚
+注解:@Transaction @GlobalTransactional
+**安装过程:**
+1.  docker run --name seata-server -p 8091:8091 seataio/seata-server:latest
+
+
+
+
+
+    
 
 
  
