@@ -1,0 +1,18 @@
+server:
+  port: 6001
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+spring:
+  application:
+    name: config
+  cloud:
+    config:
+      server:
+        git:
+#          force-pull: true
+          default-label: note
+          uri: https://github.com/X-Shuai/learn_demo.git
+          search-paths: config

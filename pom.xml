@@ -15,7 +15,8 @@
         <module>security004_remberMe</module>
         <module>security005_sms</module>
         <module>Security008_oauth2</module>
-        <module>albaba_cloud</module>
+        <module>cloud_my</module>
+        <module>eureka</module>
 
     </modules>
 

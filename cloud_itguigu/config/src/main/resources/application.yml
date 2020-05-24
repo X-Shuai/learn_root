@@ -1,0 +1,23 @@
+server:
+  port: 3333
+spring:
+  application:
+    name: config
+
+  cloud:
+    config:
+      server:
+        git:
+
+          default-label: note
+          uri: https://github.com/X-Shuai/learn_demo.git
+          username: X-Shuai
+          password: Xiaoshuai..github.com
+          search-paths: config
+eureka:
+  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka/
+
