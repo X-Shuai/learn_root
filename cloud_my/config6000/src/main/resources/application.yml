@@ -12,7 +12,16 @@ spring:
     config:
       server:
         git:
-#          force-pull: true
+          force-pull: true
           default-label: note
           uri: https://github.com/X-Shuai/learn_demo.git
           search-paths: config
+  rabbitmq:
+    host: 192.168.0.109
+    port: 5672
+    username: guest
+    password: guest
+
+management:
+  security:
+    enabled: false

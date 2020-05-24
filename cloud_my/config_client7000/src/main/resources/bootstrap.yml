@@ -8,15 +8,22 @@ spring:
     config:
       label: note # 分支名称
       name: configclient #配置文件名称
-      profile: dev # 读取的后缀，上述三个综合，为master分支上的config-dev.yml的配置文件被读取，http://config-3344.com:3344/master/config-dev.yml
+      profile: dev # 读取的后缀，上述三个综合，为master分支上的config-dev.yml的配置文件被读取，
       uri: http://localhost:6001 #配置中心的地址
+
+  rabbitmq:
+    host: 192.168.0.109
+    port: 5672
+    username: guest
+    password: guest
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: refresh
