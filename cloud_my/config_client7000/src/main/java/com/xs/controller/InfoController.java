@@ -1,10 +1,8 @@
 package com.xs.controller;
 
 import com.xs.service.ProviderFeign;
-import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +15,12 @@ import org.springframework.web.client.RestTemplate;
  **/
 @RestController
 public class InfoController {
+    @Autowired
+    private RestTemplate restTemplate;
+    @Autowired
+    private ProviderFeign providerFeign;
+
+
     @Value("${neo.hello}")
     private String hello;
 
@@ -26,10 +30,6 @@ public class InfoController {
         return this.hello;
     }
 
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private ProviderFeign providerFeign;
 
     @RequestMapping("/getport")
     public String get() throws Exception {
