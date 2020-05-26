@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  * @create: 2020-05-24 23:55
  **/
 @Component
-@FeignClient("provider")
+@FeignClient(value = "provider",fallback = ProviderFeignBack.class)
 public interface ProviderFeign {
     @GetMapping(value = "/port")
      String getPortInfo();

@@ -1,5 +1,5 @@
 package com.xs.controller;
-
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.xs.service.ProviderFeign;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ public class InfoController {
     private ProviderFeign providerFeign;
 
 
-    @Value("${neo.hello}")
+//    @Value("${neo.hello}")
     private String hello;
 
 
@@ -32,13 +32,15 @@ public class InfoController {
 
 
     @RequestMapping("/getport")
-    public String get() throws Exception {
+//    @HystrixCommand(fallbackMethod = "ribbonHelloFallback")
+    public String get(){
         // 使用 Eureka + Ribbon 后，uri 填写服务名称即可
-        System.out.printf(">>>>>>>>>>>>>");
+//        throw  new ArithmeticException();
+
         return providerFeign.getPortInfo();
-
-
-//        return restTemplate.getForObject("http://provider/port",String.class);
     }
 
+    public String ribbonHelloFallback() {
+        return "Hello, this is fallback";
+    }
 }

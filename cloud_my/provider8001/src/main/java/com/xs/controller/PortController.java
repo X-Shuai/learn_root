@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Random;
+
 /**
  * @program: learn_root
  * @description:
@@ -17,7 +19,9 @@ public class PortController {
     private String port;
 
     @RequestMapping("/port")
-    public String getPortInfo() {
+    public String getPortInfo() throws InterruptedException {
+//        int sleepTime = new Random().nextInt(3000);
+//        Thread.sleep(sleepTime);
         return this.port;
     }
 
