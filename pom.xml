@@ -17,6 +17,7 @@
         <module>Security008_oauth2</module>
         <module>cloud_my</module>
         <module>zuul</module>
+        <module>netty</module>
 
     </modules>
 

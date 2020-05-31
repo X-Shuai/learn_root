@@ -10,6 +10,7 @@
         <module>config_client7000</module>
         <module>provider8001</module>
         <module>gateway</module>
+        <module>consul-client</module>
     </modules>
     <groupId>com.xs</groupId>
     <version>1.0-SNAPSHOT</version>
