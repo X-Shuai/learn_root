@@ -334,4 +334,232 @@ ByteBuffer readOnlyBuffer = buffer.asReadOnlyBuffer();
 //todo
 ```
 
+## 选择器(Selector)
+Selector 能够检测多个注册的通道上是否有事件发生,一个单线程去管理多个通道，也就是管理多个连接和请求
+
+是一个抽象类, 
+```java
+
+public abstract class Selector implements Closeable { 
+public static Selector open();//得到一个选择器对象
+public int select(long timeout);//监控所有注册的通道，当其中有 IO 操作可以进行时，将
+//对应的 SelectionKey 加入到内部集合中并返回,参数用来设置超时时间
+public Set<SelectionKey> selectedKeys();//从内部集合中得到所有的 SelectionKey	
+}
+
+selector.select()//阻塞
+selector.select(1000);//阻塞1000毫秒，在1000毫秒后返回
+selector.wakeup();//唤醒selector
+selector.selectNow();//不阻塞，立马返还
+
+```
+
+
+1. NioEventLoop 聚合了 Selector(选择器，也叫多路复用器)，可以同时并发处理成百上千个客
+户端连接
+
+2. Socket 通道进行读写数据时，若没有数据可用时，该线程可以进行其他任务。
+3. 线程通常将非阻塞 IO 的空闲时间用于在其他通道上执行 IO 操作，所以单独的线程可以管理多个输入和输出通道。
+4. 由于读写操作都是非阻塞的，这就可以充分提升 IO 线程的运行效率，避免由于频繁 I/O 阻塞导致的线程挂起。
+5. 一个 I/O 线程可以并发处理 N 个客户端连接和读写操作，这从根本上解决了传统同步阻塞 I/O 一连接一线
+程模型，架构的性能、弹性伸缩能力和可靠性都得到了极大的提升。
+
+selector的相关方法
+```java
+ Selector open();//得到一个选择器对象  
+int select();//阻塞,有事件才会返回
+int select(long timeout);//监控所有注册的通道,当其中有io操作可以进行时,将对相应的selectionkey加入到内部集合并返回,参数设置超时时间
+Set<SelectionKey> selectedKeys();//内部集合中得到的所有selectionKey
+```
+**关系图:**
+Selector、SelectionKey、ServerScoketChannel和SocketChannel
+![Selector_SelectionKey_ServerScoketChannel](..\img\netty\Selector_SelectionKey_ServerScoketChannel.png)
+
+- 当客户端连接时，会通过ServerSocketChannel 得到 SocketChannel
+- Selector 进行监听  select 方法, 返回有事件发生的通道的个数.
+- 将socketChannel注册到Selector上, register(Selector sel, int ops), 一个selector上可以注册多个SocketChannel
+
+- 注册后返回一个 SelectionKey, 会和该Selector 关联(集合)
+- 进一步得到各个 SelectionKey (有事件发生)
+- 在通过 SelectionKey  反向获取 SocketChannel , 方法 channel()
+- 可以通过得到的 channel, 完成业务处理
+
+服务端:
+```java
+
+ public static void main(String[] args) throws Exception {
+        //创建ServerSocketChannel
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+
+        //得到一个Selector对象
+        Selector selector = Selector.open();
+
+        serverSocketChannel.socket().bind(new InetSocketAddress(8888));
+
+        //设置为非阻塞
+        serverSocketChannel.configureBlocking(false);
+
+        //把 serverSocketChannel 注册到 selector 关心 事件为 OP_ACCEPT
+        serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+
+        while (true) {
+            //这里我们等待 1 秒，如果没有事件发生, 返回
+            if(selector.select(3000) == 0) { //没有事件发生
+                System.out.println("服务器等待了 1 秒，无连接");
+                continue;
+            }
+            //如果返回的>0, 就获取到相关的 selectionKey 集合
+        //1.如果返回的>0， 表示已经获取到关注的事件
+        //2. selector.selectedKeys() 返回关注事件的集合
+        // 通过 selectionKeys 反向获取通道
+            Set<SelectionKey> selectionKeys = selector.selectedKeys();
+        //遍历 Set<SelectionKey>, 使用迭代器遍历
+            Iterator<SelectionKey> keyIterator = selectionKeys.iterator();
+
+            while (keyIterator.hasNext()) {
+            //获取到 SelectionKey
+                SelectionKey key = keyIterator.next();
+            //根据 key 对应的通道发生的事件做相应处理
+                //如果是 OP_ACCEPT, 有新的客户端连接
+                if(key.isAcceptable()) {
+                    //该该客户端生成一个 SocketChannel
+                    SocketChannel socketChannel = serverSocketChannel.accept();
+                    System.out.println(" 客 户 端 连 接 成 功 生 成 了 一 个 socketChannel " +
+                            socketChannel.hashCode());
+                    //将 SocketChannel 设置为非阻塞
+                    socketChannel.configureBlocking(false);
+                //将 socketChannel 注册到 selector, 关注事件为 OP_READ， 同时给 socketChannel
+                //关联一个 Buffer
+                    socketChannel.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(1024));
+                }
+                if(key.isReadable()) { //发生 OP_READ
+                    //通过 key 反向获取到对应 channel
+                    SocketChannel channel = (SocketChannel)key.channel();
+                    //获取到该 channel 关联的 buffer
+                    ByteBuffer buffer = (ByteBuffer)key.attachment();
+                    channel.read(buffer);
+                    System.out.println("form 客户端 " + new String(buffer.array()));
+                }
+                //手动从集合中移动当前的 selectionKey, 防止重复操作
+                keyIterator.remove();
+            }
+
+        }
+    }
+```
+客户端
+```java
+ public static void main(String[] args) throws  Exception{
+//        得到一个网络通道
+        SocketChannel socketChannel = SocketChannel.open();
+        //设置非阻塞
+        socketChannel.configureBlocking(false);
+//提供服务器端的 ip 和 端口
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 8888);
+
+        //连接服务器
+        if (!socketChannel.connect(inetSocketAddress)) {
+            while (!socketChannel.finishConnect()) {
+                System.out.println("因为连接需要时间，客户端不会阻塞，可以做其它工作..");
+            }
+        }
+        //...如果连接成功，就发送数据
+        String str = "hello, xs-shuai";
+        //Wraps a byte array into a buffer
+        ByteBuffer buffer = ByteBuffer.wrap(str.getBytes());
+        //发送数据，将 buffer 数据写入 channel
+        socketChannel.write(buffer);
+        System.in.read();
+
+
+    }
+```
+**SelectionKey**
+SelectionKey，表示 Selector 和网络通道的注册关系, 共四种:
+int OP_ACCEPT：有新的网络连接可以 accept，值为 16
+int OP_CONNECT：代表连接已经建立，值为 8
+int OP_READ：代表读操作，值为 1
+int OP_WRITE：代表写操作，值为 4
+源码中：
+```java
+
+public static final int OP_READ = 1 << 0;
+public static final int OP_WRITE = 1 << 2;
+public static final int OP_CONNECT = 1 << 3;
+public static final int OP_ACCEPT = 1 << 4;
+
+```
+常用方法:
+```java
+Selector selector();//得到关联的selector对象
+SelectableChannel  channel();//得到与之关联的通道
+Object attchment();//得到与之关联的共享数据
+SelectionKey interstOps(int ops);//设置或修改监听事件
+
+boolean isAcceptable();//是否为可以accept
+boolean isReadanble();//是否可读
+boolean isWriteable();//是否可写
+
+
+```
+ServerSocketChannel: 在服务器端监听新的客户端 Socket 连接 
+open(),//获得一个ServerSocketChannel 通道
+bind(SocketAddress local),//设置服务器端口号
+configureBlocking(boolean block);//设置为是否阻塞式 false 为非阻塞
+accept(); //接受一个连接
+register(Selector sel,int Ops);//注册一个选择器并设置监听事件
+
+SocketChannel:网络 IO 通道，具体负责进行读写操作。NIO 把缓冲区的数据写入通道，或者把通道里的数
+据读到缓冲区。
+open(),//获得一个SocketChannel 通道
+configureBlocking(boolean block);//设置为是否阻塞式 false 为非阻塞
+connect(SocketAddress local),//连接服务
+finnishConnect(); //如果连接失败,那么适应此方法完成连接操作
+
+write(ByteBuf data );//往通道写数据
+read(ByteBuf data);//从通道读取数据
+register(Selector sel,int Ops,Object att);//注册一个选择器并设置监听事件 最后一个参数为,设置共享数据
+close();//关闭通道
+
+
+群聊系统:
+
+//todo
+
+
+## NIO与零拷贝
+
+常用的零拷贝有 mmap(内存映射) 和 sendFile。
+
+mmap:
+
+将文件映射到内核缓冲区，同时， 用户空间可以共享内核空间的数据。这样，在进行网络传输时，
+就可以减少内核空间到用户空间的拷贝次数
+
+![mmap](..\img\netty\mmap.png)
+sendFile:
+数据根本不经过用户态，直接从内核缓冲区进入到
+Socket Buffer，同时，由于和用户态完全无关，就减少了一次上下文切换
+![sendfile](..\img\netty\sendfile.png)
+
+**零拷贝从操作系统角度，是没有 cpu 拷贝**
+Linux 在 2.4 版本中，做了一些修改，避免了从 内核缓冲区拷贝到 Socket buffer 的操作，直接拷贝到协议栈，
+从而再一次减少了数据拷贝 
+![sendfile2](..\img\netty\sendfile2.png)
+
+这里其实有 一次 cpu 拷贝
+kernel buffer -> socket buffer
+但是，拷贝的信息很少，比如 lenght , offset , 消耗低，可以忽略
+
+零拷贝:  
+是从 操作系统的角度来说的。因为内核缓冲区之间，没有数据是重复的   
+不仅仅带来更少的数据复制，还能带来其他的性能优势，例如更少的上下文切换，更少的 CPU 缓存伪
+共享以及无 CPU 校验和计算
+
+mmap 和 sendFile 的区别
+- mmap 适合小数据量读写，sendFile 适合大文件传输。
+- mmap 需要 4 次上下文切换，3 次数据拷贝；sendFile 需要 3 次上下文切换，最少 2 次数据拷贝。
+- sendFile 可以利用 DMA 方式，减少 CPU 拷贝，mmap 则不能（必须从内核拷贝到 Socket 缓冲区）。
+
+# Netty 概述
 
