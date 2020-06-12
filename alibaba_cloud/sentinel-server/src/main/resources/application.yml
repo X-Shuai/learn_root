@@ -1,0 +1,19 @@
+server:
+  port: 8010
+spring:
+  application:
+#    # 指定注册到nacos server上的服务名称
+    name: microservice-consumer
+
+  cloud:
+    sentinel:
+      transport:
+        dashboard: 192.168.0.166:8849
+    nacos:
+      discovery:
+        server-addr: 182.61.30.128:8848
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

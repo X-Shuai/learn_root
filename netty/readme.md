@@ -563,3 +563,97 @@ mmap 和 sendFile 的区别
 
 # Netty 概述
 
+NIO 的API较为复杂,需要熟悉使用Selector、SelectionKey、ServerScoketChannel和SocketChannel
+更需要使用java多线程,必须对多线程和网络编程非常熟悉,
+开发的工作量大,难度也非常巨大
+
+**优点:**
+//todo
+
+## 线程模型:
+
+**传统的io模型**
+1. 原理
+黄色的框表示对象， 蓝色的框表示线程
+白色的框表示方法(API)
+2. 模型特点
+采用阻塞IO模式获取输入的数据
+每个连接都需要独立的线程完成数据的输入，业务处理,数据返回
+3. 问题分析
+当并发数很大，就会创建大量的线程，占用很大系统资源
+连接创建后，如果当前线程暂时没有数据可读，该线程会阻塞在read 操作，造成线程资源浪费
+
+![io](..\img\netty\Io.png)
+
+**reactor模式**:(反应器,分发者,通知者)
+
+![reactor](..\img\netty\reactor.png)
+
+1. Reactor 模式，通过一个或多个输入同时传递给服务处理器的模式(基于事件驱动)
+2. 服务器端程序处理传入的多个请求,并将它们同步分派到相应的处理线程， 因此Reactor模式也叫 Dispatcher模式
+3. Reactor 模式使用IO复用监听事件, 收到事件后，分发给某个线程(进程), 这点就是网络服务器高并发处理关键
+
+
+**单reactor单线程:**
+![reactor1](..\img\netty\reactor1.png)
+1. Select 是前面 I/O 复用模型介绍的标准网络编程 API，可以实现应用程序通过一个阻塞对象监听多路连接请求
+2. Reactor 对象通过 Select 监控客户端请求事件(接受请求)，收到事件后通过 Dispatch 进行分发
+3. 如果是建立连接请求事件，则由 Acceptor 通过 Accept 处理连接请求，然后创建一个 Handler 对象处理连接完成后的后续业务处理
+4. 如果不是建立连接事件，则 Reactor 会分发调用连接对应的 Handler 来响应
+5. Handler 会完成 Read→业务处理→Send 的完整业务流程
+
+> 用一个线程通过多路复用搞定所有的 IO 操作（包括连接，读、写等），编码简单，清晰明了，但是如果客户端连接数量较多，将无法支撑，  
+>优点：模型简单，没有多线程、进程通信、竞争的问题，全部都在一个线程中完成  
+>缺点:性能问题，只有一个线程，无法完全发挥多核 CPU 的性能。Handler 在处理某个连接上的业务时，整个进程无法处理其他连接事件，很容易导致性能瓶颈  
+>缺点：可靠性问题，线程意外终止，或者进入死循环，会导致整个系统通信模块不可用，不能接收和处理外部消息，造成节点故障  
+
+单reactor多线程
+![reactor2](..\img\netty\reactor2.png)
+
+1. Reactor 对象通过select 监控客户端请求事件, 收到事件后，通过dispatch进行分发
+2. 如果建立连接请求, 则右Acceptor 通过accept 处理连接请求, 然后创建一个Handler对象处理完成连接后的各种事件
+3. 如果不是连接请求，则由reactor分发调用连接对应的handler 来处理
+4. handler 只负责响应事件，不做具体的业务处理, 通过read 读取数据后，会分发给后面的worker线程池的某个线程处理业务
+5. worker 线程池会分配独立线程完成真正的业务，并将结果返回给handler
+6. handler收到响应后，通过send 将结果返回给client
+
+>优点：可以充分的利用多核cpu 的处理能力  
+>缺点：多线程数据共享和访问比较复杂， reactor 处理所有的事件的监听和响应，在单线程运行， 在高并发场景容易出现性能瓶颈.
+
+
+主从reactor多线程
+![reactor3](..\img\netty\reactor3.png)
+
+1. Reactor主线程 MainReactor 对象通过select 监听连接事件, 收到事件后，通过Acceptor 处理连接事件
+2. 当 Acceptor  处理连接事件后，MainReactor 将连接分配给SubReactor 
+3. subreactor 将连接加入到连接队列进行监听,并创建handler进行各种事件处理
+4. 当有新事件发生时， subreactor 就会调用对应的handler处理
+5. handler 通过read 读取数据，分发给后面的worker 线程处理
+6. worker 线程池分配独立的worker 线程进行业务处理，并返回结果
+7. handler 收到响应的结果后，再通过send 将结果返回给client
+8. Reactor 主线程可以对应多个Reactor 子线程, 即MainRecator 可以关联多个SubReactor
+
+>优点：父线程与子线程的数据交互简单职责明确，父线程只需要接收新连接，子线程完成后续的业务处理。  
+ 优点：父线程与子线程的数据交互简单，Reactor 主线程只需要把新连接传给子线程，子线程无需返回数据。  
+ 缺点：编程复杂度较高  
+
+## netty模型
+
+
+![nettymodel](..\img\netty\nettymodel.png)
+
+1. Netty抽象出两组线程池 BossGroup 专门负责接收客户端的连接, WorkerGroup 专门负责网络的读写  
+2. BossGroup 和 WorkerGroup 类型都是 NioEventLoopGroup  
+3. NioEventLoopGroup 相当于一个事件循环组, 这个组中含有多个事件循环 ，每一个事件循环是 NioEventLoop
+4. NioEventLoop 表示一个不断循环的执行处理任务的线程， 每个NioEventLoop 都有一个selector , 用于监听绑定在其上的socket的网络通讯
+5. NioEventLoopGroup 可以有多个线程, 即可以含有多个NioEventLoop
+6. 每个Boss NioEventLoop 循环执行的步骤有3步
+  - 轮询accept 事件
+  - 处理accept 事件 , 与client建立连接 , 生成NioScocketChannel , 并将其注册到某个worker NIOEventLoop 上的 selector 
+  - 处理任务队列的任务 ， 即 runAllTasks
+7. 每个 Worker NIOEventLoop 循环执行的步骤
+ - 轮询read, write 事件
+ - 处理i/o事件， 即read , write 事件，在对应NioScocketChannel 处理
+ - 处理任务队列的任务 ， 即 runAllTasks
+8. 每个Worker NIOEventLoop  处理业务时，会使用pipeline(管道), pipeline 中包含了 channel , 即通过pipeline 可以获取到对应通道, 管道中维护了很多的 处理器
+
