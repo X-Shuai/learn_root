@@ -26,7 +26,7 @@ public class NettyServer {
         //3. 两个都是无限循环
         //4. bossGroup 和 workerGroup 含有的子线程(NioEventLoop)的个数
         // 默认实际 cpu 核数 * 2
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         ChannelInitializer<SocketChannel> channelInitializer = new ChannelInitializer<SocketChannel>() {//创建一个通道测试对象(匿名对象)
