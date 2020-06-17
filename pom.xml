@@ -18,6 +18,9 @@
         <module>cloud_my</module>
         <module>zuul</module>
         <module>netty</module>
+        <module>shiro</module>
+        <module>security</module>
+        <module>vertx</module>
 
     </modules>
 

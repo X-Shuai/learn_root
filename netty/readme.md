@@ -1108,6 +1108,22 @@ public Future<?> shutdownGracefully(),断开连接,关闭线程
 //通过给定的数据和字符编码返回一个 ByteBuf 对象（类似于 NIO 中的 ByteBuffer 但有区别）
 public static ByteBuf copiedBuffer(CharSequence string, Charset charset)
 ```
+//todo 与ByteBuf
+
+## 应用
+**群聊系统**
+
+
+
+
+
+
+# Google Protobuf
+
+
+
+
+
 
 
 
