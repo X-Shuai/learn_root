@@ -1,0 +1,20 @@
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: zuul9000
+zuul:
+  routes:
+    api-business-admin:
+      # 以 /api/business/admin 开头的请求都转发给 business-admin 服务
+      path: /api/**
+      serviceId: configclient
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+server:
+  port: 9000

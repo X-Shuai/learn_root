@@ -1,0 +1,40 @@
+server:
+  port: 7000
+
+spring:
+  application:
+    name: configclient
+  cloud:
+    config:
+#      label: note # 分支名称
+      name: configclient #配置文件名称
+      profile: dev # 读取的后缀，上述三个综合，为master分支上的config-dev.yml的配置文件被读取，
+      uri: http://localhost:6001 #配置中心的地址
+
+  rabbitmq:
+    host: 192.168.0.109
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 2000
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: refresh
+feign:
+  hystrix:
+    enabled: true
