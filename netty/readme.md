@@ -594,7 +594,7 @@ NIO 的API较为复杂,需要熟悉使用Selector、SelectionKey、ServerScoketC
 3. Reactor 模式使用IO复用监听事件, 收到事件后，分发给某个线程(进程), 这点就是网络服务器高并发处理关键
 
 
-**单reactor单线程:**
+**单reactor单线程:**  
 ![reactor1](..\img\netty\reactor1.png)
 1. Select 是前面 I/O 复用模型介绍的标准网络编程 API，可以实现应用程序通过一个阻塞对象监听多路连接请求
 2. Reactor 对象通过 Select 监控客户端请求事件(接受请求)，收到事件后通过 Dispatch 进行分发
@@ -607,7 +607,7 @@ NIO 的API较为复杂,需要熟悉使用Selector、SelectionKey、ServerScoketC
 >缺点:性能问题，只有一个线程，无法完全发挥多核 CPU 的性能。Handler 在处理某个连接上的业务时，整个进程无法处理其他连接事件，很容易导致性能瓶颈  
 >缺点：可靠性问题，线程意外终止，或者进入死循环，会导致整个系统通信模块不可用，不能接收和处理外部消息，造成节点故障  
 
-单reactor多线程
+**单reactor多线程**  
 ![reactor2](..\img\netty\reactor2.png)
 
 1. Reactor 对象通过select 监控客户端请求事件, 收到事件后，通过dispatch进行分发
@@ -621,7 +621,7 @@ NIO 的API较为复杂,需要熟悉使用Selector、SelectionKey、ServerScoketC
 >缺点：多线程数据共享和访问比较复杂， reactor 处理所有的事件的监听和响应，在单线程运行， 在高并发场景容易出现性能瓶颈.
 
 
-主从reactor多线程
+**主从reactor多线程**
 ![reactor3](..\img\netty\reactor3.png)
 
 1. Reactor主线程 MainReactor 对象通过select 监听连接事件, 收到事件后，通过Acceptor 处理连接事件
@@ -982,3 +982,140 @@ System.out.println("监听端口 6668 失败");
 }
 });
 ```
+
+**核心组件**
+- bootstrap 和ServerBootstrap
+> Bootstrap 类是客户端程序的启动引导类，ServerBootstrap 是服务端启动引导类
+```java
+public ServerBootstrap group(EventLoopGroup parentGroup, EventLoopGroup childGroup);//该方法用于服务器端，用来设置两个 EventLoop
+public B group(EventLoopGroup group);//该方法用于客户端,用来设置一个 EventLoop
+public B channel(Class<? extends C> channelClass);//该方法用来设置一个服务器端的通道实现
+public <T> B option(ChannelOption<T> option, T value);//用来给 ServerChannel 添加配置
+public <T> ServerBootstrap childOption(ChannelOption<T> childOption, T value);//用来给接收到的通道添加配置
+public ServerBootstrap childHandler(ChannelHandler childHandler);//该方法用来设置业务处理类（自定义的 handler）
+public ChannelFuture bind(int inetPort);//该方法用于服务器端，用来设置占用的端口号
+public ChannelFuture connect(String inetHost, int inetPort);//该方法用于客户端，用来连接服务器端
+
+```
+-  Future、ChannelFuture
+> 具体的实现就是通过 Future 和 ChannelFutures，他们可以注册一个监听，当操作执行成功或失败时监听会自动触发注册的监听事件
+```java
+Channel channel();返回当前正在进行 IO 操作的通道
+ChannelFuture sync();等待异步操作执行完毕
+Netty 网络通信的组件,能够用于执行网络 I/O 操作
+```
+- channel
+> 通过Channel 可获得当前网络连接的通道的状态  
+> 通过Channel 可获得 网络连接的配置参数(例如接收缓冲区大小)  
+> Channel 提供异步的网络 I/O 操作(如建立连接,读写,绑定端口)异步调用意味着任何 I/O 调用都将立即返回,并且不保证在调用结束时所请求的 I/O 操作已完成  
+> 调用立即返回一个 ChannelFuture 实例,通过注册监听器到 ChannelFuture 上,可以 I/O 操作成功,失败或取消时回调通知调用方
+> 不同的协议类型,不同的阻塞类型,对应不同的channel类型
+```java
+NioSocketChannel,异步的客户端 TCP Socket 连接
+NioServerSocketChannel,异步的服务器端 TCP Socket 连接
+NioDatagramChannel,异步的 UDP 连接
+NioSctpChannel,异步的客户端 Sctp 连接
+NioSctpServerChannel,异步的 Sctp 服务器端连接,这些通道涵盖了 UDP 和 TCP 网络 IO 以及文件 IO,
+
+```
+- Selector
+>通过 Selector 一个线程可以监听多个连接的 Channel 事件。  
+>当向一个 Selector 中注册 Channel 后，Selector 内部的机制就可以自动不断地查询(Select) 这些注册的 Channel 是否有已就绪的 I/O 事件（例如可读，可写，网络连接完成等），这样程序就可以很简单地使用一个线程高效地管理多个 Channel 
+- ChannelHandler
+>ChannelHandler 是一个接口，处理 I/O 事件或拦截 I/O 操作，并将其转发到其 ChannelPipeline(业务处理链)中的下一个处理程序。  
+>ChannelHandler 本身并没有提供很多方法，因为这个接口有许多的方法需要实现，方便使用期间，可以继承它的子类
+```java
+ChannelInboundHandler 用于处理入站 I/O 事件
+ChannelOutboundHandler 用于处理出站 I/O 操作
+
+//适配器
+ChannelInboundHandlerAdapter 用于处理入站 I/O 事件
+ChannelOutboundHandlerAdapter 用于处理出站 I/O 操作
+ChannelDuplexHandler 用于处理入站和出站事件
+```
+- Pipeline 和 ChannelPipeline
+>ChannelPipeline 是一个 Handler 的集合  
+>也可以这样理解：ChannelPipeline 是 保存 ChannelHandler 的 List，用于处理或拦截 Channel 的入站事件和出站操作  
+>ChannelPipeline 实现了一种高级形式的拦截过滤器模式，使用户可以完全控制事件的处理方式，以及 Channel 中各个的 ChannelHandler 如何相互交互  
+>每个 Channel 都有且仅有一个 ChannelPipeline 与之对应  
+```java
+
+serverBootstrap.group(bossGroup,workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ServerInitializer());
+//1.一个 Channel 包含了一个 ChannelPipeline
+
+public class ServerInitializer extends ChannelInitializer<SocketChannel> {
+    @Override
+    protected void initChannel(SocketChannel socketChannel) throws Exception {
+        //2.ChannelPipeline 中又维护了一个由 ChannelHandlerContext 
+        ChannelPipeline pipeline = socketChannel.pipeline();
+        pipeline.addLast("http",new HttpHandler());
+    }
+}
+public class HttpHandler extends SimpleChannelInboundHandler<HttpObject> {
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
+            System.out.println("客户端地址:"+ctx.channel().remoteAddress());
+
+    }
+}
+
+一个 Channel 包含了一个 ChannelPipeline,而 ChannelPipeline 中又维护了一个由 ChannelHandlerContext 组成的双向链表,并且每个 ChannelHandlerContext 中又关联着一个 ChannelHandler
+
+入站事件和出站事件在一个双向链表中,入站事件会从链表 head 往后传递到最后一个入站的 handler,出站事件会从链表 tail 往前传递到最前一个出站的 handler,两种类型的 handler 互不干扰
+
+ChannelPipeline addFirst(ChannelHandler... handlers);把一个业务处理类(handler)添加到链中的第一个位置
+ChannelPipeline addLast(ChannelHandler... handlers);把一个业务处理类(handler)添加到链中的最后一个位置
+
+```
+- ChannelHandlerContext  
+> 保存 Channel 相关的所有上下文信息，同时关联一个ChannelHandler对象  
+> ChannelHandlerContext中包含一个具体的事件处理器ChannelHandler同时ChannelHandlerContext中也绑定了对应的pipeline和Channel的信息，
+```java
+ChannelFuture close(),关闭通道
+ChannelOutboundInvoker flush()刷新
+ChannelFuture writeAndFlush(Object msg),将 数 据 写 到 ChannelPipeline 中 当 前
+ChannelHandler 的下一个 ChannelHandler 开始处理(出栈)
+
+```
+- ChannelOption
+>在创建 Channel 实例后,一般都需要设置 ChannelOption 参数
+```java
+ChannelOption.SO_BACKLOG:对应 TCP/IP 协议 listen 函数中的 backlog 参数,用来初始化服务器可连接队列大小.服
+务端处理客户端连接请求是顺序处理的,所以同一时间只能处理一个客户端连接,多个客户
+端来的时候,服务端将不能处理的客户端连接请求放在队列中等待处理,backlog 参数指定
+了队列的大小.
+ChannelOption.SO_KEEPALIVE:一直保持连接活动状态
+```
+- EventLoopGroup NioEventLoopGroup
+> EventLoopGroup 是一组 EventLoop 的抽象，Netty 为了更好的利用多核 CPU 资源，一般会有多个 EventLoop 同时工作，每个 EventLoop 维护着一个 Selector 实例    
+> EventLoopGroup 提供 next 接口，可以从组里面按照一定规则获取其中一个 EventLoop来处理任务。在 Netty 服务器端编程中，我们一般都需要提供两个 EventLoopGroup，例如：BossEventLoopGroup 和 WorkerEventLoopGroup。  
+> 通常一个服务端口即一个 ServerSocketChannel对应一个Selector 和一个EventLoop线程。BossEventLoop 负责接收客户端的连接并将 SocketChannel 交给 WorkerEventLoopGroup 来进行 IO 处理，如下图所示  
+![eventloop](..\img\netty\eventloop.jpg)  
+
+1. BossEventLoopGroup 通常是一个单线程的 EventLoop，EventLoop 维护着一个注册了ServerSocketChannel 的 Selector 实例BossEventLoop 不断轮询 Selector 将连接事件分离出来  
+2. 通常是 OP_ACCEPT 事件，然后将接收到的 SocketChannel 交给 WorkerEventLoopGroup  
+3. WorkerEventLoopGroup 会由 next 选择其中一个 EventLoop来将这个 SocketChannel 注册到其维护的 Selector 并对其后续的 IO 事件进行处理  
+
+```java
+public NioEventLoopGroup(),构造方法
+public Future<?> shutdownGracefully(),断开连接,关闭线程
+```
+- Unpooled
+ > Netty 提供一个专门用来操作缓冲区(即Netty的数据容器)的工具类
+```java
+//通过给定的数据和字符编码返回一个 ByteBuf 对象（类似于 NIO 中的 ByteBuffer 但有区别）
+public static ByteBuf copiedBuffer(CharSequence string, Charset charset)
+```
+
+
+
+
+
+
+
+
+
+
+
