@@ -2,6 +2,9 @@
 性能高
 完整生态
 
+启动参数:
+model,jre
+
 ## router
 
 
