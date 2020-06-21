@@ -1119,15 +1119,51 @@ public static ByteBuf copiedBuffer(CharSequence string, Charset charset)
 
 心跳检测
 
-
-
-
-
 # Google Protobuf
 
+## 编码 & 解码
+
+编码 >> 二进制(传输) >>解码 
+
+1. Netty 自身提供了(编解码器 解码器)
+2. Netty 提供的编码器
+  - StringEncoder，对字符串数据进行编码   StringDecoder, 对字符串数据进行解码
+  - ObjectEncoder，对 Java 对象进行编码 ObjectDecoder，对 Java 对象进行解码
+3.  ObjectDecoder 和 ObjectEncoder 可以用来实现 POJO 对象或各种业务对象的编码和解码，
+   底层使用的仍是 Java 序列化技术 , 而 Java 序列化技术本身效率就不高，存在如下问题
+   无法跨语言
+   序列化后的体积太大，是二进制编码的 5 倍多。
+   序列化性能太低
+   使用 :google Protobuf
+
+## Protobuf
+
+1. 一种轻便高效的结构化数据存储格式，可以用于结构化数据串行化，或者说序列化。它很适合做数据存储或 RPC(远程过程调用 remote procedurecall)数据交换格式
+    http +json ->tcp + Protobuf
+2. 跨语言
+3. 以 message 的方式来管理数据的
+4. 高性能，高可靠性
+java ->protobuf(编译) ->xx.java -> 编码器  ==>解码器
 
 
 
+# Netty 编解码器和 handler 的调用机制
+Netty 的主要组件有 Channel、EventLoop、ChannelFuture、ChannelHandler、ChannelPipe
+
+他们都实现了 ChannelInboundHadnler 或者 ChannelOutboundHandler 接口。
+在这些类中，channelRead 方法已经被重写了。以入站为例，对于每个从入站 Channel 读取的消息，这个方法会
+被调用。随后，它将调用由解码器所提供的 decode()方法进行解码，并将已经解码的字节转发给 ChannelPipeline
+中的下一个 ChannelInboundHandler。
+## 解码器
+
+## Netty 的 handler 链的调用机制
+
+
+
+
+
+
+ 
 
 
 
