@@ -21,6 +21,7 @@
         <module>shiro</module>
         <module>security</module>
         <module>vertx</module>
+        <module>elk</module>
 
     </modules>
 
