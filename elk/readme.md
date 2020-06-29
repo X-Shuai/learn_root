@@ -136,10 +136,100 @@ http.cors.allow-origin: "*"
 
 ### 结构化查询
 8. 
+- term 主要用于精确匹配哪些值(未经分析的文本数据类型
+- terms 
+```json5
+{
+  "query" : {
+    "terms" : { 
+      "age" : [20,21]
+   }
+ }
+```
+```json5
+{
+  "range": {
+    "age": {
+      "gte":  20,
+      "lt":  30
+   }
+ }
+}
 
+```
+```json5
+{
+  "range": {
+    "age": {
+      "gte":  20,
+      "lt":  30
+   }
+ }
+}
+// 范围操作符包含：
+// gt :: 大于
+// gte :: 大于等于
+// lt :: 小于
+// lte :: 小于等于
 
+```
+- exists 某个字段是否存在的时候使用
+```json5
+{
+  "query": {
+    "exists": {  //必须包含
+      "field": "card"
+   }
+ }
+}
+```
+- match 查询是一个标准查询，不管你需要全文本查询还是精确查询基本上都要用到它
+```json5
+
+{
+  "match": {
+    "tweet": "About Search"
+ }
+}
+```
+- bool 查询可以用来合并多个条件查询结果的布尔逻辑，它包含以下操作符：
+must :: 多个查询条件的完全匹配,相当于 and 。
+must_not :: 多个查询条件的相反匹配，相当于 not 。
+should :: 至少有一个查询条件匹配, 相当于 or 。
+- filter 过滤查询
+```json5
+{
+  "query": {
+    "bool": {
+      "filter": {
+        "term": {
+          "age": 20
+       }
+     }
+   }
+ }
+}
+```
 
 >美化 加上个  ?pretty
 >单独数据 ?_sources= {字段1},{字段2},...
 >     /_sources 原始数据
 >文档是否存在 HEAD请求    /{索引}/{类型}/{id} 判断状态码
+
+## 分词器 
+推荐IK
+
+构建数据
+多词 : 空格隔开
+"operator":"and"  or 
+"minimum_should_match":"80%" 最小匹配度
+
+>bool 查询会为每个文档计算相关度评分 _score ， 再将所有匹配的 must 和 should 语句的分数 _score 求和，
+最后除以 must 和 should 语句的总数。
+must_not 语句不会影响评分； 它的作用只是将不相关的文档排除。
+
+权重 
+"boost": 2
+
+
+## 集群
