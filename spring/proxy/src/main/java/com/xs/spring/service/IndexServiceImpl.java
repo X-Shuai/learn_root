@@ -11,6 +11,7 @@ import com.xs.spring.dao.IndexDao;
 public class IndexServiceImpl  implements IndexService{
 
     IndexDao indexDao;
+
     public String query() {
         System.out.println("service...................");
          indexDao.query();
@@ -25,7 +26,7 @@ public class IndexServiceImpl  implements IndexService{
 //        return indexDao;
 //    }
 
-    public void setIndexDao(IndexDao indexDao) {
-        this.indexDao = indexDao;
-    }
+//    public void setIndexDao(IndexDao indexDao) {
+//        this.indexDao = indexDao;
+//    }
 }
