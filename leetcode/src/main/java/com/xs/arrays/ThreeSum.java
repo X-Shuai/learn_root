@@ -33,10 +33,22 @@ public class ThreeSum {
         for (int targetIndex = 0; targetIndex <= nums.length-2; targetIndex++) {
             int minIndex = targetIndex+1;
             int maxIndex = nums.length - 1;
+            if(targetIndex>0 && nums[targetIndex] == nums[targetIndex-1]) {
+                continue;
+            }
+
             while (minIndex<maxIndex){
+
                 if ( nums[targetIndex]==nums[minIndex]+nums[maxIndex]){
                     targetArray.add(Arrays.asList(nums[targetIndex], nums[minIndex], nums[maxIndex]));
+                    if (nums[minIndex] == nums[minIndex+1]){
+                        minIndex++;
+                    }
+                    if (nums[maxIndex] == nums[maxIndex-1]){
+                        maxIndex--;
+                    }
                     minIndex++;
+                    maxIndex--;
                     continue;
                 }
                 if ( nums[targetIndex]<nums[minIndex]+nums[maxIndex]){
