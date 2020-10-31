@@ -9,18 +9,14 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>security001_demo</module>
-        <module>security002_auth</module>
-        <module>security003_image</module>
-        <module>security004_remberMe</module>
-        <module>security005_sms</module>
-        <module>Security008_oauth2</module>
         <module>cloud_my</module>
-        <module>zuul</module>
         <module>netty</module>
         <module>shiro</module>
         <module>security</module>
         <module>vertx</module>
+        <module>elk</module>
+        <module>spring</module>
+        <module>other</module>
 
     </modules>
 

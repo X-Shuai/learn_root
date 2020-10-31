@@ -17,6 +17,8 @@ import java.text.SimpleDateFormat;
  **/
 public class GroupServerHandel extends SimpleChannelInboundHandler<String> {
 
+
+
     /***
      * 定义一个channel组,管理所有的channel
      * GlobalEventExecutor.INSTANCE全局的是事假执行器 单利

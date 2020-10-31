@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans default-autowire="byType">
+    <bean id="indexDao" class="com.xs.spring.dao.IndexDaoImpl"></bean>
+
+    <bean id="indexService" class="com.xs.spring.service.IndexServiceImpl">
+<!--        <constructor-args name="indexDao" ref="indexDao"></constructor-args>-->
+<!--        <property name="indexDao" ref="indexDao"></property>-->
+    </bean>
+</beans>
