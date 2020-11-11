@@ -10,10 +10,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>spring</artifactId>
+
+    <properties>
+        <spring.version>5.2.2.RELEASE</spring.version>
+    </properties>
+
     <packaging>pom</packaging>
     <modules>
         <module>springAop</module>
         <module>proxy</module>
+        <module>ioc_overAll</module>
+
     </modules>
 
 
