@@ -10,11 +10,41 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>spring</artifactId>
+
+    <properties>
+        <spring.version>5.2.2.RELEASE</spring.version>
+    </properties>
+
     <packaging>pom</packaging>
     <modules>
         <module>springAop</module>
         <module>proxy</module>
+        <module>ioc_overAll</module>
+        <module>spring-bean</module>
+        <module>dependency-lookup</module>
     </modules>
 
+
+    <dependencies>
+        <!-- Spring IoC 核心依赖 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

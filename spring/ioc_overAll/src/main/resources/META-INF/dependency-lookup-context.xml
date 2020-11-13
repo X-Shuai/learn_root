@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+        <bean id="user" class="com.xs.domain.User">
+            <property name="name" value="xs-shuai"/>
+            <property name="age" value="23"/>
+        </bean>
+
+<!--    primary="true" -->
+    <bean id="superUser" class="com.xs.domain.SuperUser" parent="user" primary="true">
+        <property name="address" value="成都"/>
+    </bean>
+
+    <bean id="beanFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+        <property name="targetBeanName" value="user"/>
+    </bean>
+
+</beans>
