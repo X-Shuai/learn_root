@@ -2,6 +2,9 @@ package com.xs.domain;
 
 import com.xs.annotation.Super;
 
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /**
  * @program: learn_root
  * @description:
@@ -10,6 +13,7 @@ import com.xs.annotation.Super;
  **/
 @Super
 public class SuperUser extends User{
+    
     private String address;
 
     public String getAddress() {
