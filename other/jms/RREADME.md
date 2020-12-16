@@ -37,3 +37,15 @@ RabbitMQ的问题
 1. AMQP结构
 2. 生成者流转过程
 ```
+
+转发规则
+exchange:  
+fanout: 全部转发到queue
+direct:
+topic:
+headers: 
+
+临时队列 
+
+**核心概念**
+
