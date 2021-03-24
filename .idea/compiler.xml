@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="config6000" />
+        <module name="gateway" />
+        <module name="jms" />
+        <module name="spring-bean" />
+        <module name="dependency-lookup" />
+        <module name="dependency-injection" />
+        <module name="springAop" />
+        <module name="config_client7000" />
+        <module name="provider8001" />
+        <module name="quartz-spring" />
+        <module name="consul-client" />
+        <module name="rabbit-mq" />
+        <module name="proxy" />
+        <module name="ioc_overAll" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cloud_my" target="1.8" />
+      <module name="config6000" target="1.8" />
+      <module name="config_client7000" target="1.8" />
+      <module name="consul-client" target="1.8" />
+      <module name="dependency-injection" target="1.8" />
+      <module name="dependency-lookup" target="1.8" />
+      <module name="elk" target="1.5" />
+      <module name="gateway" target="1.8" />
+      <module name="ioc_overAll" target="1.8" />
+      <module name="jms" target="1.5" />
+      <module name="learn_root" target="1.5" />
+      <module name="netty" target="8" />
+      <module name="other" target="1.5" />
+      <module name="provider8001" target="1.8" />
+      <module name="proxy" target="1.8" />
+      <module name="quartz-spring" target="1.8" />
+      <module name="rabbit-mq" target="1.5" />
+      <module name="security" target="1.5" />
+      <module name="shiro" target="1.5" />
+      <module name="spring" target="1.8" />
+      <module name="spring-bean" target="1.8" />
+      <module name="springAop" target="1.8" />
+      <module name="vertx" target="1.5" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="quartz-spring" options="-parameters" />
+    </option>
+  </component>
+</project>

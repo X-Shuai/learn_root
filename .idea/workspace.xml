@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="53fb4cc3-75ed-452d-8d0a-dac479635e4e" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/other/rabbit-mq/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="D:/apache-maven-3.6.2" />
+        <option name="userSettingsFile" value="D:\apache-maven-3.6.2\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="1" />
+  </component>
+  <component name="ProjectId" id="1qD0Uyr9O6IRJWtbJdqa6j4BHnz" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Intelli\learn_root\other" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.ConsulApplication9003">
+    <configuration name="ConfigApplication6000" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="config6000" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.xs.ConfigApplication6000" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConfigClient7000" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="config_client7000" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.xs.ConfigClient7000" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConsulApplication9003" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="consul-client" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.xs.ConsulApplication9003" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GateWay9001" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="gateway" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.xs.GateWay9001" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Provider8001" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="provider8001" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.xs.Provider8001" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="53fb4cc3-75ed-452d-8d0a-dac479635e4e" name="Default Changelist" comment="" />
+      <created>1616598872926</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1616598872926</updated>
+      <workItem from="1616598878908" duration="581000" />
+    </task>
+    <task id="LOCAL-00001" summary="优化目结构">
+      <created>1616599237677</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1616599237677</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="优化目结构" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化目结构" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="909" y="284" key="CommitChangelistDialog2" timestamp="1616599234843">
+      <screen x="63" y="0" width="2497" height="1440" />
+    </state>
+    <state x="909" y="284" key="CommitChangelistDialog2/63.0.2497.1440@63.0.2497.1440" timestamp="1616599234843" />
+    <state x="903" y="453" key="Vcs.Push.Dialog.v2" timestamp="1616599278098">
+      <screen x="63" y="0" width="2497" height="1440" />
+    </state>
+    <state x="903" y="453" key="Vcs.Push.Dialog.v2/63.0.2497.1440@63.0.2497.1440" timestamp="1616599278098" />
+    <state x="1105" y="633" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1616599351076">
+      <screen x="63" y="0" width="2497" height="1440" />
+    </state>
+    <state x="1105" y="633" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/63.0.2497.1440@63.0.2497.1440" timestamp="1616599351076" />
+    <state x="686" y="380" key="new project wizard" timestamp="1616599411285">
+      <screen x="63" y="0" width="2497" height="1440" />
+    </state>
+    <state x="686" y="380" key="new project wizard/63.0.2497.1440@63.0.2497.1440" timestamp="1616599411285" />
+  </component>
+</project>

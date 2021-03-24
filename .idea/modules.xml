@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/cloud_my/cloud_my.iml" filepath="$PROJECT_DIR$/cloud_my/cloud_my.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloud_my/config6000/config6000.iml" filepath="$PROJECT_DIR$/cloud_my/config6000/config6000.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloud_my/config_client7000/config_client7000.iml" filepath="$PROJECT_DIR$/cloud_my/config_client7000/config_client7000.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloud_my/consul-client/consul-client.iml" filepath="$PROJECT_DIR$/cloud_my/consul-client/consul-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring/dependency-injection/dependency-injection.iml" filepath="$PROJECT_DIR$/spring/dependency-injection/dependency-injection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring/dependency-lookup/dependency-lookup.iml" filepath="$PROJECT_DIR$/spring/dependency-lookup/dependency-lookup.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloud_my/gateway/gateway.iml" filepath="$PROJECT_DIR$/cloud_my/gateway/gateway.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring/ioc_overAll/ioc_overAll.iml" filepath="$PROJECT_DIR$/spring/ioc_overAll/ioc_overAll.iml" />
+      <module fileurl="file://$PROJECT_DIR$/other/jms/jms.iml" filepath="$PROJECT_DIR$/other/jms/jms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/learn_root.iml" filepath="$PROJECT_DIR$/learn_root.iml" />
+      <module fileurl="file://$PROJECT_DIR$/netty/netty.iml" filepath="$PROJECT_DIR$/netty/netty.iml" />
+      <module fileurl="file://$PROJECT_DIR$/other/other.iml" filepath="$PROJECT_DIR$/other/other.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloud_my/provider8001/provider8001.iml" filepath="$PROJECT_DIR$/cloud_my/provider8001/provider8001.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring/proxy/proxy.iml" filepath="$PROJECT_DIR$/spring/proxy/proxy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/other/quartz-spring/quartz-spring.iml" filepath="$PROJECT_DIR$/other/quartz-spring/quartz-spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/other/rabbit-mq/rabbit-mq.iml" filepath="$PROJECT_DIR$/other/rabbit-mq/rabbit-mq.iml" />
+      <module fileurl="file://$PROJECT_DIR$/security/security.iml" filepath="$PROJECT_DIR$/security/security.iml" />
+      <module fileurl="file://$PROJECT_DIR$/shiro/shiro.iml" filepath="$PROJECT_DIR$/shiro/shiro.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring/spring.iml" filepath="$PROJECT_DIR$/spring/spring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring/spring-bean/spring-bean.iml" filepath="$PROJECT_DIR$/spring/spring-bean/spring-bean.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spring/springAop/springAop.iml" filepath="$PROJECT_DIR$/spring/springAop/springAop.iml" />
+    </modules>
+  </component>
+</project>

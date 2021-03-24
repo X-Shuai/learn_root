@@ -17,6 +17,7 @@
         <module>elk</module>
         <module>spring</module>
         <module>other</module>
+        <module>rabbit-mq</module>
     </modules>
 
 
