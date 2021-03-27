@@ -1,6 +1,5 @@
 package com.xs;
 
-import com.xs.config.RabbitmqConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -27,7 +26,7 @@ public class RabbitMqTest {
     public void testSendByTopics(){
         for (int i=0;i<5;i++){
             String message = "sms email inform to user"+i;
-            rabbitTemplate.convertAndSend(RabbitmqConfig.EXCHANGE_TOPICS_INFORM,"inform.sms.email",message);
+            rabbitTemplate.convertAndSend("inform.sms.email",message);
             System.out.println("Send Message is:'" + message + "'");
         }
     }
