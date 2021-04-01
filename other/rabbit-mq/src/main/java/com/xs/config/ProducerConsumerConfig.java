@@ -16,7 +16,7 @@ public class ProducerConsumerConfig {
 
     @Bean
     public Queue myQueue() {
-        Queue queue=new Queue("myqueue");
+        Queue queue=new Queue(Config.PRODUCER_QUEUE);
         return queue;
     }
 

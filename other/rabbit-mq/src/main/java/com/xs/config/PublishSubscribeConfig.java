@@ -20,19 +20,19 @@ public class PublishSubscribeConfig {
 
     @Bean
     public Queue myQueue1() {
-        Queue queue=new Queue("queue1");
+        Queue queue=new Queue(Config.PUBLISH_QUEUE_2);
         return queue;
     }
 
     @Bean
     public Queue myQueue2() {
-        Queue queue=new Queue("queue2");
+        Queue queue=new Queue(Config.PUBLISH_QUEUE_2);
         return queue;
     }
 
     @Bean
     public FanoutExchange fanoutExchange(){
-        FanoutExchange fanoutExchange=new FanoutExchange("fanout");
+        FanoutExchange fanoutExchange=new FanoutExchange(Config.PUBLISH_EXCHANGE_FANOUT);
         return fanoutExchange;
     }
 

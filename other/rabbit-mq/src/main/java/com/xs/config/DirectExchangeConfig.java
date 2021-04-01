@@ -15,19 +15,19 @@ import org.springframework.context.annotation.Configuration;
 public class DirectExchangeConfig {
     @Bean
     public DirectExchange directExchange(){
-        DirectExchange directExchange=new DirectExchange("direct");
+        DirectExchange directExchange=new DirectExchange(Config.DIRECT_EXCHANGE);
         return directExchange;
     }
 
     @Bean
     public Queue directQueue1() {
-        Queue queue=new Queue("directqueue1");
+        Queue queue=new Queue(Config.DIRECT_QUEUE_1);
         return queue;
     }
 
     @Bean
     public Queue directQueue2() {
-        Queue queue=new Queue("directqueue2");
+        Queue queue=new Queue(Config.DIRECT_QUEUE_2);
         return queue;
     }
 
