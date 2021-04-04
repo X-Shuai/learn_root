@@ -20,7 +20,7 @@ public class PublishSubscribeConfig {
 
     @Bean
     public Queue myQueue1() {
-        Queue queue=new Queue(Config.PUBLISH_QUEUE_2);
+        Queue queue=new Queue(Config.PUBLISH_QUEUE_1);
         return queue;
     }
 

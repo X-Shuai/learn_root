@@ -38,6 +38,21 @@ public class Listener {
     public  void publishQueue2(String message){
         System.out.println("PUBLISH_QUEUE_2:监听到的消息为：" + message);
     }
+    @RabbitListener(queues=Config.TOPIC_QUEUE_1)
+    public  void topicQueue1(String message){
+        System.out.println("TOPIC_QUEUE_1:监听到的消息为：" + message);
+    }
+
+    @RabbitListener(queues=Config.TOPIC_QUEUE_2)
+    public  void topicQueue2(String message){
+        System.out.println("TOPIC_QUEUE_2:监听到的消息为：" + message);
+    }
+
+    @RabbitListener(queues = Config.ORDER_TIMEOUT_QUEUE,concurrency="4-10")
+    public  void lazyMessage(String message){
+        System.out.println("接收到消息的时间"+System.currentTimeMillis());
+        System.out.println("ORDER_TIMEOUT_QUEUE:监听到的消息为：" + message);
+    }
 
 
 

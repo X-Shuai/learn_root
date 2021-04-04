@@ -17,19 +17,19 @@ import org.springframework.context.annotation.Configuration;
 public class TopicExchangeConfig {
     @Bean
     public TopicExchange topicExchange(){
-        TopicExchange topicExchange=new TopicExchange("mytopic");
+        TopicExchange topicExchange=new TopicExchange(Config.TOPIC);
         return topicExchange;
     }
 
     @Bean
     public Queue topicQueue1() {
-        Queue queue=new Queue("topicqueue1");
+        Queue queue=new Queue(Config.TOPIC_QUEUE_1);
         return queue;
     }
 
     @Bean
     public Queue topicQueue2() {
-        Queue queue=new Queue("topicqueue2");
+        Queue queue=new Queue(Config.TOPIC_QUEUE_2);
         return queue;
     }
 
