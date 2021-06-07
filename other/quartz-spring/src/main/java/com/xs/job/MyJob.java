@@ -16,7 +16,8 @@ import java.util.Date;
 public class MyJob extends QuartzJobBean {
 
     @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext jobExecutionContext)
+            throws JobExecutionException {
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println("任务执行----" + sdf.format(new Date()));
     }
